@@ -279,3 +279,62 @@ body {
     min-height: 50px;
     font-size: 24px;
 }
+
+.month-view {
+    width: 100%;
+    max-width: 700px;
+}
+
+.month-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+}
+
+.month-navigation h2 {
+    min-width: 120px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.month-navigation button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    color: #222;
+    font-size: 32px;
+    cursor: pointer;
+}
+
+.month-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    margin-top: 32px;
+}
+
+.month-weekdays span {
+    text-align: center;
+    font-size: 12px;
+    padding-bottom: 8px;
+}
+
+.month-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.month-cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.month-cell.empty {
+    cursor: default;
+}

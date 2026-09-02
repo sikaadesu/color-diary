@@ -472,6 +472,7 @@ nextDayButton.addEventListener("click", () => {
 const dayView = document.querySelector(".diary-navigation");
 const dayColor = document.getElementById("diary-color");
 const weekView = document.getElementById("week-view");
+const monthView = document.getElementById("month-view");
 
 const dayModeButton = document.getElementById("day-mode");
 const weekModeButton = document.getElementById("week-mode");
@@ -519,6 +520,7 @@ function setDiaryMode(mode) {
     dayView.hidden = mode !== "day";
     dayColor.hidden = mode !== "day";
     weekView.hidden = mode !== "week";
+    monthView.hidden = mode !== "month";
 
     if (mode === "day") {
         loadDiaryDay();
@@ -527,6 +529,10 @@ function setDiaryMode(mode) {
     if (mode === "week") {
         weekStartDate = getWeekStartDate(diaryDate);
         loadDiaryWeek();
+    }
+
+    if (mode === "month") {
+        loadDiaryMonth();
     }
 }
 
@@ -537,6 +543,10 @@ dayModeButton.addEventListener("click", () => {
 
 weekModeButton.addEventListener("click", () => {
     setDiaryMode("week");
+});
+
+monthModeButton.addEventListener("click", () => {
+    setDiaryMode("month");
 });
 
 /*
@@ -562,9 +572,18 @@ function loadDiaryWeek() {
         document.getElementById("week-sat")
     ];
 
-    colorElements.forEach((element) => {
+    colorElements.forEach((element, index) => {
+        const date = new Date(startDate);
+        date.setDate(date.getDate() + index);
+
         element.textContent = "・";
         element.style.backgroundColor = "transparent";
+        element.dataset.date = formatDate(date);
+
+        element.onclick = () => {
+            diaryDate = element.dataset.date;
+            setDiaryMode("day");
+        };
     });
 
     if (!db) return;
@@ -620,4 +639,103 @@ document.getElementById("previous-week").addEventListener("click", () => {
 
 document.getElementById("next-week").addEventListener("click", () => {
     changeDiaryWeek(1);
+});
+
+/*
+ * Store the month currently displayed in Month view.
+ */
+let monthDate = new Date(`${diaryDate}T00:00:00`);
+
+
+/*
+ * Load the calendar and display saved colors for the current month.
+ */
+function loadDiaryMonth() {
+    const monthDateElement = document.getElementById("month-date");
+    const monthGrid = document.getElementById("month-grid");
+
+    const year = monthDate.getFullYear();
+    const month = monthDate.getMonth();
+
+    monthDateElement.textContent =
+        `${year}-${String(month + 1).padStart(2, "0")}`;
+
+    monthGrid.innerHTML = "";
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    // Add empty cells before the first day of the month.
+    for (let i = 0; i < firstDay; i++) {
+        const emptyCell = document.createElement("div");
+        emptyCell.className = "month-cell empty";
+
+        monthGrid.appendChild(emptyCell);
+    }
+
+    const colorCells = [];
+
+    // Create one cell for each day of the month.
+    for (let day = 1; day <= daysInMonth; day++) {
+        const cell = document.createElement("div");
+
+        cell.className = "month-cell";
+        cell.textContent = "・";
+
+        const date = new Date(year, month, day);
+        const dateString = formatDate(date);
+
+        cell.dataset.date = dateString;
+
+cell.addEventListener("click", () => {
+    diaryDate = cell.dataset.date;
+    setDiaryMode("day");
+});
+
+colorCells.push(cell);
+
+monthGrid.appendChild(cell);
+    }
+
+    if (!db) return;
+
+    const transaction = db.transaction(STORE_NAME, "readonly");
+    const store = transaction.objectStore(STORE_NAME);
+
+    colorCells.forEach((cell) => {
+        const request = store.get(cell.dataset.date);
+
+        request.onsuccess = () => {
+            const entry = request.result;
+
+            if (!entry) {
+                return;
+            }
+
+            cell.textContent = "";
+            cell.style.backgroundColor = entry.color;
+        };
+    });
+
+    transaction.onerror = () => {
+        console.error("Failed to load diary month.");
+    };
+}
+
+/*
+ * Move the visible month by the specified number of months.
+ */
+function changeDiaryMonth(months) {
+    monthDate.setMonth(monthDate.getMonth() + months);
+
+    loadDiaryMonth();
+}
+
+
+document.getElementById("previous-month").addEventListener("click", () => {
+    changeDiaryMonth(-1);
+});
+
+document.getElementById("next-month").addEventListener("click", () => {
+    changeDiaryMonth(1);
 });
