@@ -255,6 +255,7 @@ request.onsuccess = (event) => {
     db = event.target.result;
     loadTodayEntry();
     loadDiaryDay();
+    setDiaryMode("week");
 };
 
 request.onerror = () => {
@@ -479,7 +480,7 @@ const dayModeButton = document.getElementById("day-mode");
 const weekModeButton = document.getElementById("week-mode");
 const monthModeButton = document.getElementById("month-mode");
 
-let diaryMode = "day";
+let diaryMode = "week";
 let weekStartDate = getWeekStartDate(diaryDate);
 
 
@@ -796,9 +797,10 @@ importFile.addEventListener("change", async () => {
         const data = JSON.parse(text);
 
         if (!validateImportData(data)) {
-            console.error("Invalid Color Diary data.");
-            return;
-        }
+    console.error("Invalid Color Diary data.");
+    window.alert("Invalid Color Diary data.");
+    return;
+}
 
         if (!db) {
             console.error("Database is not ready.");
@@ -835,8 +837,9 @@ importFile.addEventListener("change", async () => {
         };
 
     } catch (error) {
-        console.error("Failed to read import file.", error);
-    }
+    console.error("Failed to read import file.");
+    window.alert("Failed to read the import file.");
+}
 
     importFile.value = "";
 });

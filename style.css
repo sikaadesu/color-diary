@@ -19,7 +19,7 @@ body {
 /* Keep the main content above the bottom navigation. */
 .screen {
     min-height: 100vh;
-    padding: 32px 24px 100px;
+    padding: 48px 24px 100px;
 }
 
 /* Today date */
@@ -370,4 +370,14 @@ body {
 .settings-content button:hover {
     background: #222;
     color: #fafafa;
+}
+
+.app-title {
+    position: fixed;
+    top: 16px;
+    left: 24px;
+    z-index: 10;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
 }
