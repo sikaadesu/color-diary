@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Color Diary</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <main id="today-screen" class="screen">
+        <header class="today-header">
+            <h1 id="today-date"></h1>
+        </header>
+
+        <section class="color-picker-area">
+
+    <div id="color-preview" class="color-preview"></div>
+
+    <div class="color-picker">
+
+        <div
+            id="saturation-brightness"
+            class="saturation-brightness"
+            role="slider"
+            aria-label="Choose saturation and brightness"
+            tabindex="0"
+        >
+            <div id="sb-cursor" class="picker-cursor"></div>
+        </div>
+
+        <div
+            id="hue-wheel"
+            class="hue-wheel"
+            role="slider"
+            aria-label="Choose hue"
+            tabindex="0"
+        >
+            <div id="hue-cursor" class="picker-cursor"></div>
+        </div>
+
+    </div>
+
+</section>
+
+        <button id="save-button" class="save-button" aria-label="Save">
+            ✓
+        </button>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Main navigation">
+        <button data-screen="diary">Diary</button>
+        <button data-screen="today" class="active">Today</button>
+        <button data-screen="settings">Settings</button>
+    </nav>
+
+    <script src="app.js"></script>
+</body>
+</html>
