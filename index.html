@@ -48,6 +48,22 @@
         </button>
     </main>
 
+    <main id="diary-screen" class="screen" hidden>
+    <header class="diary-header">
+        <h1>Diary</h1>
+    </header>
+
+    <section class="diary-view">
+        <div class="diary-navigation">
+            <button id="previous-day" aria-label="Previous day">‹</button>
+            <h2 id="diary-date"></h2>
+            <button id="next-day" aria-label="Next day">›</button>
+        </div>
+
+        <div id="diary-color" class="diary-color"></div>
+    </section>
+</main>
+
     <nav class="bottom-nav" aria-label="Main navigation">
         <button data-screen="diary">Diary</button>
         <button data-screen="today" class="active">Today</button>

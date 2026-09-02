@@ -371,3 +371,99 @@ function hexToHsl(hex) {
         l: l * 100
     };
 }
+
+const screens = {
+    today: document.getElementById("today-screen"),
+    diary: document.getElementById("diary-screen")
+};
+
+const navigationButtons = document.querySelectorAll(".bottom-nav button");
+
+navigationButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+        const screenName = button.dataset.screen;
+
+        if (!screens[screenName]) {
+            return;
+        }
+
+        Object.values(screens).forEach((screen) => {
+            screen.hidden = true;
+        });
+
+        screens[screenName].hidden = false;
+
+        navigationButtons.forEach((navButton) => {
+            navButton.classList.remove("active");
+        });
+
+        button.classList.add("active");
+    });
+});
+
+let diaryDate = todayDate;
+
+const diaryDateElement = document.getElementById("diary-date");
+const diaryColorElement = document.getElementById("diary-color");
+const previousDayButton = document.getElementById("previous-day");
+const nextDayButton = document.getElementById("next-day");
+
+
+/*
+ * Display the selected diary date and its saved color.
+ * Missing dates are intentionally left empty because the absence of a color
+ * is part of the diary itself.
+ */
+function loadDiaryDay() {
+    diaryDateElement.textContent = diaryDate;
+    diaryColorElement.textContent = "・";
+    diaryColorElement.style.backgroundColor = "transparent";
+
+    if (!db) return;
+
+    const transaction = db.transaction(STORE_NAME, "readonly");
+    const store = transaction.objectStore(STORE_NAME);
+    const request = store.get(diaryDate);
+
+    request.onsuccess = () => {
+        const entry = request.result;
+
+        if (!entry) {
+            return;
+        }
+
+        diaryColorElement.textContent = "";
+        diaryColorElement.style.backgroundColor = entry.color;
+    };
+
+    request.onerror = () => {
+        console.error("Failed to load diary entry.");
+    };
+}
+
+
+/*
+ * Move the diary date by a specified number of days.
+ */
+function changeDiaryDate(days) {
+    const date = new Date(`${diaryDate}T00:00:00`);
+
+    date.setDate(date.getDate() + days);
+
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    diaryDate = `${year}-${month}-${day}`;
+
+    loadDiaryDay();
+}
+
+
+previousDayButton.addEventListener("click", () => {
+    changeDiaryDate(-1);
+});
+
+nextDayButton.addEventListener("click", () => {
+    changeDiaryDate(1);
+});
