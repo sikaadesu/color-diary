@@ -375,7 +375,8 @@ function hexToHsl(hex) {
 
 const screens = {
     today: document.getElementById("today-screen"),
-    diary: document.getElementById("diary-screen")
+    diary: document.getElementById("diary-screen"),
+    settings: document.getElementById("settings-screen")
 };
 
 const navigationButtons = document.querySelectorAll(".bottom-nav button");
@@ -738,4 +739,40 @@ document.getElementById("previous-month").addEventListener("click", () => {
 
 document.getElementById("next-month").addEventListener("click", () => {
     changeDiaryMonth(1);
+});
+
+document.getElementById("export-button").addEventListener("click", () => {
+    if (!db) {
+        console.error("Database is not ready.");
+        return;
+    }
+
+    const transaction = db.transaction(STORE_NAME, "readonly");
+    const store = transaction.objectStore(STORE_NAME);
+
+    const request = store.getAll();
+
+    request.onsuccess = () => {
+        const entries = request.result;
+
+        const json = JSON.stringify(entries, null, 2);
+
+        const blob = new Blob([json], {
+            type: "application/json"
+        });
+
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `color-diary-${todayDate}.json`;
+
+        link.click();
+
+        URL.revokeObjectURL(url);
+    };
+
+    request.onerror = () => {
+        console.error("Failed to export diary data.");
+    };
 });

@@ -338,3 +338,36 @@ body {
 .month-cell.empty {
     cursor: default;
 }
+
+.settings-header {
+    text-align: center;
+}
+
+.settings-header h1 {
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+}
+
+.settings-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    margin-top: 48px;
+}
+
+.settings-content button {
+    width: min(80vw, 320px);
+    height: 48px;
+    border: 1px solid #222;
+    background: transparent;
+    color: #222;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.settings-content button:hover {
+    background: #222;
+    color: #fafafa;
+}
