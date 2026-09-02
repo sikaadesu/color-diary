@@ -54,6 +54,11 @@
     </header>
 
     <section class="diary-view">
+        <div class="diary-mode-switch">
+    <button id="day-mode" class="active">Day</button>
+    <button id="week-mode">Week</button>
+    <button id="month-mode">Month</button>
+</div>
         <div class="diary-navigation">
             <button id="previous-day" aria-label="Previous day">‹</button>
             <h2 id="diary-date"></h2>
@@ -61,8 +66,57 @@
         </div>
 
         <div id="diary-color" class="diary-color"></div>
+
+        <div id="week-view" class="week-view" hidden>
+
+    <div class="week-navigation">
+        <button id="previous-week" aria-label="Previous week">‹</button>
+        <h2 id="week-date"></h2>
+        <button id="next-week" aria-label="Next week">›</button>
+    </div>
+
+    <div class="week-days">
+        <div class="week-day">
+            <span>Sun</span>
+            <div id="week-sun" class="week-color">・</div>
+        </div>
+
+        <div class="week-day">
+            <span>Mon</span>
+            <div id="week-mon" class="week-color">・</div>
+        </div>
+
+        <div class="week-day">
+            <span>Tue</span>
+            <div id="week-tue" class="week-color">・</div>
+        </div>
+
+        <div class="week-day">
+            <span>Wed</span>
+            <div id="week-wed" class="week-color">・</div>
+        </div>
+
+        <div class="week-day">
+            <span>Thu</span>
+            <div id="week-thu" class="week-color">・</div>
+        </div>
+
+        <div class="week-day">
+            <span>Fri</span>
+            <div id="week-fri" class="week-color">・</div>
+        </div>
+
+        <div class="week-day">
+            <span>Sat</span>
+            <div id="week-sat" class="week-color">・</div>
+        </div>
+    </div>
+
+</div>
     </section>
-</main>
+    </main>
+
+    
 
     <nav class="bottom-nav" aria-label="Main navigation">
         <button data-screen="diary">Diary</button>

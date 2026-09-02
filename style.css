@@ -1,3 +1,7 @@
+[hidden] {
+    display: none !important;
+}
+
 /* Reset default browser spacing and sizing. */
 * {
     box-sizing: border-box;
@@ -199,4 +203,79 @@ body {
     height: min(70vw, 320px);
     margin-top: 40px;
     font-size: 32px;
+}
+
+.diary-mode-switch {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 32px;
+}
+
+.diary-mode-switch button {
+    border: none;
+    background: transparent;
+    color: #222;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.diary-mode-switch button.active {
+    font-weight: 700;
+}
+
+.week-view {
+    width: 100%;
+    max-width: 700px;
+}
+
+.week-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+}
+
+.week-navigation h2 {
+    min-width: 120px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.week-navigation button {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: transparent;
+    color: #222;
+    font-size: 32px;
+    cursor: pointer;
+}
+
+.week-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    width: 100%;
+    margin-top: 32px;
+}
+
+.week-day {
+    text-align: center;
+}
+
+.week-day span {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 12px;
+}
+
+.week-color {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 1;
+    min-height: 50px;
+    font-size: 24px;
 }

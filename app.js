@@ -254,6 +254,7 @@ request.onupgradeneeded = (event) => {
 request.onsuccess = (event) => {
     db = event.target.result;
     loadTodayEntry();
+    loadDiaryDay();
 };
 
 request.onerror = () => {
@@ -466,4 +467,157 @@ previousDayButton.addEventListener("click", () => {
 
 nextDayButton.addEventListener("click", () => {
     changeDiaryDate(1);
+});
+
+const dayView = document.querySelector(".diary-navigation");
+const dayColor = document.getElementById("diary-color");
+const weekView = document.getElementById("week-view");
+
+const dayModeButton = document.getElementById("day-mode");
+const weekModeButton = document.getElementById("week-mode");
+const monthModeButton = document.getElementById("month-mode");
+
+let diaryMode = "day";
+let weekStartDate = getWeekStartDate(diaryDate);
+
+
+/*
+ * Get the Sunday that starts the week containing the given date.
+ */
+function getWeekStartDate(dateString) {
+    const date = new Date(`${dateString}T00:00:00`);
+    const dayOfWeek = date.getDay();
+
+    date.setDate(date.getDate() - dayOfWeek);
+
+    return formatDate(date);
+}
+
+
+/*
+ * Format a Date object as YYYY-MM-DD.
+ */
+function formatDate(date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+}
+
+
+/*
+ * Change the visible diary mode.
+ */
+function setDiaryMode(mode) {
+    diaryMode = mode;
+
+    dayModeButton.classList.toggle("active", mode === "day");
+    weekModeButton.classList.toggle("active", mode === "week");
+    monthModeButton.classList.toggle("active", mode === "month");
+
+    dayView.hidden = mode !== "day";
+    dayColor.hidden = mode !== "day";
+    weekView.hidden = mode !== "week";
+
+    if (mode === "day") {
+        loadDiaryDay();
+    }
+
+    if (mode === "week") {
+        weekStartDate = getWeekStartDate(diaryDate);
+        loadDiaryWeek();
+    }
+}
+
+
+dayModeButton.addEventListener("click", () => {
+    setDiaryMode("day");
+});
+
+weekModeButton.addEventListener("click", () => {
+    setDiaryMode("week");
+});
+
+/*
+ * Load the seven days belonging to the current week.
+ */
+function loadDiaryWeek() {
+    const weekDateElement = document.getElementById("week-date");
+
+    const startDate = new Date(`${weekStartDate}T00:00:00`);
+    const endDate = new Date(startDate);
+    endDate.setDate(endDate.getDate() + 6);
+
+    weekDateElement.textContent =
+        `${formatDate(startDate)} – ${formatDate(endDate)}`;
+
+    const colorElements = [
+        document.getElementById("week-sun"),
+        document.getElementById("week-mon"),
+        document.getElementById("week-tue"),
+        document.getElementById("week-wed"),
+        document.getElementById("week-thu"),
+        document.getElementById("week-fri"),
+        document.getElementById("week-sat")
+    ];
+
+    colorElements.forEach((element) => {
+        element.textContent = "・";
+        element.style.backgroundColor = "transparent";
+    });
+
+    if (!db) return;
+
+    const transaction = db.transaction(STORE_NAME, "readonly");
+    const store = transaction.objectStore(STORE_NAME);
+
+    const requests = [];
+
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(startDate);
+        date.setDate(date.getDate() + i);
+
+        requests.push(store.get(formatDate(date)));
+    }
+
+    requests.forEach((request, index) => {
+        request.onsuccess = () => {
+            const entry = request.result;
+
+            if (!entry) {
+                return;
+            }
+
+            colorElements[index].textContent = "";
+            colorElements[index].style.backgroundColor = entry.color;
+        };
+    });
+
+    transaction.onerror = () => {
+        console.error("Failed to load diary week.");
+    };
+}
+
+
+/*
+ * Move the visible week by one week.
+ */
+function changeDiaryWeek(weeks) {
+    const date = new Date(`${weekStartDate}T00:00:00`);
+
+    date.setDate(date.getDate() + weeks * 7);
+
+    weekStartDate = formatDate(date);
+
+    loadDiaryWeek();
+}
+
+
+document.getElementById("previous-week").addEventListener("click", () => {
+    changeDiaryWeek(-1);
+});
+
+document.getElementById("next-week").addEventListener("click", () => {
+    changeDiaryWeek(1);
 });
