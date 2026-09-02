@@ -776,3 +776,126 @@ document.getElementById("export-button").addEventListener("click", () => {
         console.error("Failed to export diary data.");
     };
 });
+
+const importButton = document.getElementById("import-button");
+const importFile = document.getElementById("import-file");
+
+importButton.addEventListener("click", () => {
+    importFile.click();
+});
+
+importFile.addEventListener("change", async () => {
+    const file = importFile.files[0];
+
+    if (!file) {
+        return;
+    }
+
+    try {
+        const text = await file.text();
+        const data = JSON.parse(text);
+
+        if (!validateImportData(data)) {
+            console.error("Invalid Color Diary data.");
+            return;
+        }
+
+        if (!db) {
+            console.error("Database is not ready.");
+            return;
+        }
+
+        const transaction = db.transaction(STORE_NAME, "readwrite");
+        const store = transaction.objectStore(STORE_NAME);
+
+        const countRequest = store.count();
+
+        countRequest.onsuccess = () => {
+            const entryCount = countRequest.result;
+
+            if (entryCount === 0) {
+                importEntries(data);
+                return;
+            }
+
+            const shouldReplace = window.confirm(
+                "Replace existing diary data?"
+            );
+
+            if (!shouldReplace) {
+                console.log("Import canceled.");
+                return;
+            }
+
+            importEntries(data);
+        };
+
+        countRequest.onerror = () => {
+            console.error("Failed to check existing diary data.");
+        };
+
+    } catch (error) {
+        console.error("Failed to read import file.", error);
+    }
+
+    importFile.value = "";
+});
+
+function importEntries(data) {
+    if (!db) {
+        console.error("Database is not ready.");
+        return;
+    }
+
+    const transaction = db.transaction(STORE_NAME, "readwrite");
+    const store = transaction.objectStore(STORE_NAME);
+
+    store.clear();
+
+    data.forEach((entry) => {
+        store.put(entry);
+    });
+
+    transaction.oncomplete = () => {
+        console.log("Diary data imported successfully.");
+
+        loadTodayEntry();
+        loadDiaryDay();
+        loadDiaryWeek();
+        loadDiaryMonth();
+    };
+
+    transaction.onerror = () => {
+        console.error("Failed to import diary data.");
+    };
+}
+
+function validateImportData(data) {
+    if (!Array.isArray(data)) {
+        return false;
+    }
+
+    return data.every((entry) => {
+        if (!entry || typeof entry !== "object") {
+            return false;
+        }
+
+        if (typeof entry.date !== "string") {
+            return false;
+        }
+
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(entry.date)) {
+            return false;
+        }
+
+        if (typeof entry.color !== "string") {
+            return false;
+        }
+
+        if (!/^#[0-9a-fA-F]{6}$/.test(entry.color)) {
+            return false;
+        }
+
+        return true;
+    });
+}
