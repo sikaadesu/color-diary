@@ -228,3 +228,146 @@ sbCursor.style.top = `${100 - currentBrightness}%`;
 }
 
 setInitialPickerPosition();
+
+/*
+ * Open the diary database.
+ * IndexedDB keeps diary entries available after the page is closed.
+ */
+const DB_NAME = "ColorDiary";
+const DB_VERSION = 1;
+const STORE_NAME = "entries";
+
+let db;
+
+const request = indexedDB.open(DB_NAME, DB_VERSION);
+
+request.onupgradeneeded = (event) => {
+    db = event.target.result;
+
+    if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, {
+            keyPath: "date"
+        });
+    }
+};
+
+request.onsuccess = (event) => {
+    db = event.target.result;
+    loadTodayEntry();
+};
+
+request.onerror = () => {
+    console.error("Failed to open IndexedDB.");
+};
+
+/*
+ * Save today's color to IndexedDB.
+ * Saving only happens when the user explicitly presses the check button.
+ */
+document.getElementById("save-button").addEventListener("click", () => {
+    if (!db) {
+        console.error("Database is not ready.");
+        return;
+    }
+
+    const color = hslToHex(
+        currentHue,
+        currentSaturation,
+        currentBrightness
+    );
+
+    const entry = {
+        date: todayDate,
+        color: color
+    };
+
+    const transaction = db.transaction(STORE_NAME, "readwrite");
+    const store = transaction.objectStore(STORE_NAME);
+
+    store.put(entry);
+
+    transaction.onerror = () => {
+        console.error("Failed to save the color.");
+    };
+});
+
+/*
+ * Load today's saved color from IndexedDB.
+ * If no entry exists, the picker keeps its default state.
+ */
+function loadTodayEntry() {
+    if (!db) return;
+
+    const transaction = db.transaction(STORE_NAME, "readonly");
+    const store = transaction.objectStore(STORE_NAME);
+
+    const request = store.get(todayDate);
+
+    request.onsuccess = () => {
+        const entry = request.result;
+
+        if (!entry) {
+            return;
+        }
+
+        const { h, s, l } = hexToHsl(entry.color);
+
+        currentHue = h;
+        currentSaturation = s;
+        currentBrightness = l;
+
+        setInitialPickerPosition();
+    };
+
+    request.onerror = () => {
+        console.error("Failed to load today's entry.");
+    };
+}
+
+
+/*
+ * Convert a HEX color to HSL values.
+ * The picker stores its current state as HSL internally.
+ */
+function hexToHsl(hex) {
+    const r = parseInt(hex.slice(1, 3), 16) / 255;
+    const g = parseInt(hex.slice(3, 5), 16) / 255;
+    const b = parseInt(hex.slice(5, 7), 16) / 255;
+
+    const max = Math.max(r, g, b);
+    const min = Math.min(r, g, b);
+
+    let h = 0;
+    let s = 0;
+    const l = (max + min) / 2;
+
+    if (max !== min) {
+        const d = max - min;
+
+        s = l > 0.5
+            ? d / (2 - max - min)
+            : d / (max + min);
+
+        switch (max) {
+            case r:
+                h = (g - b) / d + (g < b ? 6 : 0);
+                break;
+
+            case g:
+                h = (b - r) / d + 2;
+                break;
+
+            case b:
+                h = (r - g) / d + 4;
+                break;
+        }
+
+        h *= 60;
+    }
+
+    return {
+        h: h,
+        s: s * 100,
+        l: l * 100
+    };
+}
