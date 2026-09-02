@@ -381,3 +381,95 @@ body {
     font-weight: 700;
     letter-spacing: 0.05em;
 }
+
+@media (max-width: 600px) {
+    .screen {
+        padding: 48px 16px 80px;
+    }
+
+    .color-picker-area {
+        gap: 4vh;
+        margin-top: 4vh;
+    }
+
+    .color-preview {
+        width: min(55vw, 240px);
+        height: min(55vw, 240px);
+    }
+
+    .color-picker {
+        gap: 4vw;
+    }
+
+    .saturation-brightness {
+        width: min(52vw, 220px);
+        height: min(52vw, 220px);
+    }
+
+    .hue-wheel {
+        width: min(28vw, 120px);
+        height: min(28vw, 120px);
+    }
+
+    .save-button {
+        width: 56px;
+        height: 56px;
+        margin-top: 4vh;
+        font-size: 24px;
+    }
+
+        .diary-view {
+        margin-top: 4vh;
+    }
+
+    .diary-mode-switch {
+        gap: 5vw;
+        margin-bottom: 3vh;
+    }
+
+    .diary-navigation,
+    .week-navigation,
+    .month-navigation {
+        gap: 4vw;
+    }
+
+    .diary-navigation h2,
+    .week-navigation h2,
+    .month-navigation h2 {
+        min-width: 100px;
+        font-size: 14px;
+    }
+
+    .diary-color {
+        width: min(70vw, 280px);
+        height: min(70vw, 280px);
+        margin-top: 4vh;
+    }
+
+    .week-view,
+    .month-view {
+        width: 100%;
+    }
+
+    .week-days {
+        margin-top: 3vh;
+    }
+
+    .month-weekdays {
+        margin-top: 3vh;
+    }
+
+    .month-cell {
+        font-size: 16px;
+    }
+
+        .settings-content {
+        gap: 3vh;
+        margin-top: 5vh;
+    }
+
+    .settings-content button {
+        width: min(80vw, 320px);
+        height: 48px;
+    }
+}
